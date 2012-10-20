@@ -1,4 +1,4 @@
-;;; spotify.el --- Control the spotify application from emacs via dbus
+;;; spotify.el --- Control the spotify application from emacs via D-Bus
 
 ;; Copyright (C) 2012 R.W van 't Veer
 
@@ -32,41 +32,43 @@
 
 ;;; Code:
 
-(defconst spotify-dbus-send-base
-  "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.")
-
-(defun spotify-dbus-send (command)
-  "Send dbus COMMAND to spotify."
-  (shell-command (concat spotify-dbus-send-base command)))
+(defun spotify-dbus-call (interface method)
+  "Call METHOD on INTERFACE via D-Bus on the Spotify service."
+  (dbus-call-method-asynchronously :session
+                                   "org.mpris.MediaPlayer2.spotify"
+                                   "/org/mpris/MediaPlayer2"
+                                   interface
+                                   method
+                                   nil))
 
 (defun spotify-play ()
   "Start spotify playback."
   (interactive)
-  (spotify-dbus-send "Player.Play"))
+  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Play"))
 
 (defun spotify-pause ()
   "Pause spotify playback."
   (interactive)
-  (spotify-dbus-send "Player.Pause"))
+  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Pause"))
 
 (defun spotify-playpause ()
   "Play / pause spotify playback."
   (interactive)
-  (spotify-dbus-send "Player.PlayPause"))
+  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "PlayPause"))
 
 (defun spotify-next ()
   "Next song in spotify."
   (interactive)
-  (spotify-dbus-send "Player.Next"))
+  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Next"))
 
 (defun spotify-previous ()
   "Previous song in spotify."
   (interactive)
-  (spotify-dbus-send "Player.Previous"))
+  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Previous"))
 
 (defun spotify-quit ()
   "Quit the spotify application."
   (interactive)
-  (spotify-dbus-send "Quit"))
+  (spotify-dbus-call "org.mpris.MediaPlayer2" "Quit"))
 
 ;;; spotify.el ends here
