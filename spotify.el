@@ -81,17 +81,50 @@
   (interactive)
   (spotify-dbus-call "org.mpris.MediaPlayer2" "Quit"))
 
+(defun spotify-humanize-metadata (metadata)
+  "Transform METADATA from spotify to a human readable version."
+  (when metadata
+    (flet ((join (vals sep) (mapconcat 'identity vals sep)))
+      (let ((artists (join (caadr (assoc "xesam:artist" metadata)) ", "))
+            (album (caadr (assoc "xesam:album" metadata)))
+            (track-nr (caadr (assoc "xesam:trackNumber" metadata)))
+            (title (caadr (assoc "xesam:title" metadata))))
+        (format "%s / %s / %d: %s" artists album track-nr title)))))
+
 (defun spotify-current ()
   "Return the current song playing in spotify application."
   (interactive)
-  (flet ((join (vals sep) (mapconcat 'identity vals sep)))
-    (let* ((metadata (spotify-dbus-get-property "org.mpris.MediaPlayer2.Player"
-                                                "Metadata"))
-           (artists (join (caadr (assoc "xesam:artist" metadata)) ", "))
-           (album (caadr (assoc "xesam:album" metadata)))
-           (track-nr (caadr (assoc "xesam:trackNumber" metadata)))
-           (title (caadr (assoc "xesam:title" metadata)))
-           (current (format "%s / %s / %d: %s" artists album track-nr title)))
-      current)))
+  (let ((metadata (spotify-dbus-get-property "org.mpris.MediaPlayer2.Player"
+                                             "Metadata")))
+    (spotify-humanize-metadata metadata)))
+
+(defun spotify-properties-changed (interface properties &rest ignored)
+  "Signal listener to echo current song playing in spotify
+application to the mini buffer."
+  (let ((current (spotify-humanize-metadata (caadr (assoc "Metadata" properties)))))
+    (when current
+      (message "Now playing: %s" current))))
+
+(defvar spotify-metadata-change-listener-id nil
+  "Object returned by `dbus-register-signal' to disable with
+`dbus-unregister-object'")
+
+(defun spotify-enable-song-notifications ()
+  "Enable notifications for the currently playing song by
+spotify application in the minibuffer."
+  (interactive)
+  (setq spotify-metadata-change-listener-id
+        (dbus-register-signal :session
+                              "org.mpris.MediaPlayer2.spotify"
+                              "/org/mpris/MediaPlayer2"
+                              "org.freedesktop.DBus.Properties"
+                              "PropertiesChanged"
+                              #'spotify-properties-changed)))
+
+(defun spotify-disable-song-notifications ()
+  "Disable notifications for the currently playing song by
+spotify application in the minibuffer."
+  (interactive)
+  (dbus-unregister-object spotify-metadata-change-listener-id))
 
 ;;; spotify.el ends here
