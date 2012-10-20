@@ -26,7 +26,7 @@
 ;;; Commentary:
 
 ;; Play, pause, skip songs in the Spotify app from Emacs.
-;; 
+;;
 ;; (global-set-key (kbd "s-<pause>") #'spotify-playpause)
 ;; (global-set-key (kbd "s-M-<pause>") #'spotify-next)
 
@@ -35,7 +35,7 @@
 (require 'dbus)
 
 (defun spotify-dbus-call (interface method)
-  "Call METHOD on INTERFACE via D-Bus on the Spotify service."
+  "On INTERFACE call METHOD via D-Bus on the Spotify service."
   (dbus-call-method-asynchronously :session
                                    "org.mpris.MediaPlayer2.spotify"
                                    "/org/mpris/MediaPlayer2"
@@ -44,7 +44,7 @@
                                    nil))
 
 (defun spotify-dbus-get-property (interface property)
-  "Get value of PROPERTY on INTERFACE via D-Bus on the Spotify service."
+  "On INTERFACE get value of PROPERTY via D-Bus on the Spotify service."
   (dbus-get-property :session
                      "org.mpris.MediaPlayer2.spotify"
                      "/org/mpris/MediaPlayer2"
@@ -99,19 +99,22 @@
     (spotify-humanize-metadata metadata)))
 
 (defun spotify-properties-changed (interface properties &rest ignored)
-  "Signal listener to echo current song playing in spotify
-application to the mini buffer."
+  "Echo metadata to the mini buffer.
+
+The INTERFACE argument is ignored, PROPERTIES is expected to be
+an alist and the IGNORED argument is also ignored."
   (let ((current (spotify-humanize-metadata (caadr (assoc "Metadata" properties)))))
     (when current
       (message "Now playing: %s" current))))
 
 (defvar spotify-metadata-change-listener-id nil
-  "Object returned by `dbus-register-signal' to disable with
-`dbus-unregister-object'")
+  "Object returned by `dbus-register-signal'.")
 
 (defun spotify-enable-song-notifications ()
-  "Enable notifications for the currently playing song by
-spotify application in the minibuffer."
+  "Enable notifications for the currently playing song in spotify application.
+
+Changes to the currently playing song in spotify will be echoed
+to the mini buffer."
   (interactive)
   (setq spotify-metadata-change-listener-id
         (dbus-register-signal :session
@@ -122,8 +125,7 @@ spotify application in the minibuffer."
                               #'spotify-properties-changed)))
 
 (defun spotify-disable-song-notifications ()
-  "Disable notifications for the currently playing song by
-spotify application in the minibuffer."
+  "Disable notifications for the currently playing song in spotify application."
   (interactive)
   (dbus-unregister-object spotify-metadata-change-listener-id))
 
