@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(require 'dbus)
+
 (defun spotify-dbus-call (interface method)
   "Call METHOD on INTERFACE via D-Bus on the Spotify service."
   (dbus-call-method-asynchronously :session
@@ -40,6 +42,14 @@
                                    interface
                                    method
                                    nil))
+
+(defun spotify-dbus-get-property (interface property)
+  "Get value of PROPERTY on INTERFACE via D-Bus on the Spotify service."
+  (dbus-get-property :session
+                     "org.mpris.MediaPlayer2.spotify"
+                     "/org/mpris/MediaPlayer2"
+                     interface
+                     property))
 
 (defun spotify-play ()
   "Start spotify playback."
@@ -70,5 +80,18 @@
   "Quit the spotify application."
   (interactive)
   (spotify-dbus-call "org.mpris.MediaPlayer2" "Quit"))
+
+(defun spotify-current ()
+  "Return the current song playing in spotify application."
+  (interactive)
+  (flet ((join (vals sep) (mapconcat 'identity vals sep)))
+    (let* ((metadata (spotify-dbus-get-property "org.mpris.MediaPlayer2.Player"
+                                                "Metadata"))
+           (artists (join (caadr (assoc "xesam:artist" metadata)) ", "))
+           (album (caadr (assoc "xesam:album" metadata)))
+           (track-nr (caadr (assoc "xesam:trackNumber" metadata)))
+           (title (caadr (assoc "xesam:title" metadata)))
+           (current (format "%s / %s / %d: %s" artists album track-nr title)))
+      current)))
 
 ;;; spotify.el ends here
