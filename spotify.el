@@ -129,4 +129,6 @@ to the mini buffer."
   (interactive)
   (dbus-unregister-object spotify-metadata-change-listener-id))
 
+(provide 'spotify)
+
 ;;; spotify.el ends here
