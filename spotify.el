@@ -43,6 +43,24 @@
                                    method
                                    nil))
 
+(defmacro spotify-defun-player-command (command)
+  `(defun ,(intern (concat "spotify-" (downcase command))) ()
+     ,(format "Call %s on spotify player." command)
+     (interactive)
+     (spotify-dbus-call "org.mpris.MediaPlayer2.Player" ,command)
+     (message "Spotify %s" ,command)))
+
+(spotify-defun-player-command "Play")
+(spotify-defun-player-command "Pause")
+(spotify-defun-player-command "PlayPause")
+(spotify-defun-player-command "Next")
+(spotify-defun-player-command "Previous")
+
+(defun spotify-quit ()
+  "Quit the spotify application."
+  (interactive)
+  (spotify-dbus-call "org.mpris.MediaPlayer2" "Quit"))
+
 (defun spotify-dbus-get-property (interface property)
   "On INTERFACE get value of PROPERTY via D-Bus on the Spotify service."
   (dbus-get-property :session
@@ -50,36 +68,6 @@
                      "/org/mpris/MediaPlayer2"
                      interface
                      property))
-
-(defun spotify-play ()
-  "Start spotify playback."
-  (interactive)
-  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Play"))
-
-(defun spotify-pause ()
-  "Pause spotify playback."
-  (interactive)
-  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Pause"))
-
-(defun spotify-playpause ()
-  "Play / pause spotify playback."
-  (interactive)
-  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "PlayPause"))
-
-(defun spotify-next ()
-  "Next song in spotify."
-  (interactive)
-  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Next"))
-
-(defun spotify-previous ()
-  "Previous song in spotify."
-  (interactive)
-  (spotify-dbus-call "org.mpris.MediaPlayer2.Player" "Previous"))
-
-(defun spotify-quit ()
-  "Quit the spotify application."
-  (interactive)
-  (spotify-dbus-call "org.mpris.MediaPlayer2" "Quit"))
 
 (defun spotify-humanize-metadata (metadata)
   "Transform METADATA from spotify to a human readable version."
