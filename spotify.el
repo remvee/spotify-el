@@ -87,13 +87,14 @@
     (spotify-humanize-metadata metadata)))
 
 (defun spotify-properties-changed (interface properties &rest ignored)
-  "Echo metadata to the mini buffer.
+  "Echo spotify playback status and/or metadata to the mini buffer.
 
 The INTERFACE argument is ignored, PROPERTIES is expected to be
 an alist and the IGNORED argument is also ignored."
-  (let ((current (spotify-humanize-metadata (caadr (assoc "Metadata" properties)))))
-    (when current
-      (message "Now playing: %s" current))))
+  (let ((status (caadr (assoc "PlaybackStatus" properties)))
+        (current (spotify-humanize-metadata (caadr (assoc "Metadata" properties)))))
+    (when current (message "Now playing: %s" current))
+    (when status (message "Spotify %s" status))))
 
 (defvar spotify-metadata-change-listener-id nil
   "Object returned by `dbus-register-signal'.")
