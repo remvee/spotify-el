@@ -107,7 +107,7 @@ to the mini buffer."
   (interactive)
   (setq spotify-metadata-change-listener-id
         (dbus-register-signal :session
-                              "org.mpris.MediaPlayer2.spotify"
+                              "org.mpris.MediaPlayer2.Player"
                               "/org/mpris/MediaPlayer2"
                               "org.freedesktop.DBus.Properties"
                               "PropertiesChanged"
