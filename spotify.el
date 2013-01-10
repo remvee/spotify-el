@@ -93,8 +93,8 @@ The INTERFACE argument is ignored, PROPERTIES is expected to be
 an alist and the IGNORED argument is also ignored."
   (let ((status (caadr (assoc "PlaybackStatus" properties)))
         (current (spotify-humanize-metadata (caadr (assoc "Metadata" properties)))))
-    (when current (message "Now playing: %s" current))
-    (when status (message "Spotify %s" status))))
+    (cond (current (message "Now playing: %s" current))
+          (status (message "Spotify %s" status)))))
 
 (defvar spotify-metadata-change-listener-id nil
   "Object returned by `dbus-register-signal'.")
