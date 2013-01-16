@@ -1,6 +1,6 @@
 ;;; spotify.el --- Control the spotify application from emacs via D-Bus
 
-;; Copyright (C) 2012 R.W van 't Veer
+;; Copyright (C) 2012-2013 R.W van 't Veer
 
 ;; Author: R.W. van 't Veer
 ;; Created: 18 Oct 2012
