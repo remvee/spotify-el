@@ -68,12 +68,13 @@
   (defun spotify-humanize-metadata (metadata)
     "Transform METADATA from spotify to a human readable version."
     (when metadata
-      (flet ((join (vals sep) (mapconcat 'identity vals sep)))
-        (let ((artists (join (caadr (assoc "xesam:artist" metadata)) ", "))
-              (album (caadr (assoc "xesam:album" metadata)))
-              (track-nr (caadr (assoc "xesam:trackNumber" metadata)))
-              (title (caadr (assoc "xesam:title" metadata))))
-          (format "%s / %s / %d: %s" artists album track-nr title)))))
+      (let ((artists (mapconcat 'identity
+                                (caadr (assoc "xesam:artist" metadata))
+                                ", "))
+            (album (caadr (assoc "xesam:album" metadata)))
+            (track-nr (caadr (assoc "xesam:trackNumber" metadata)))
+            (title (caadr (assoc "xesam:title" metadata))))
+        (format "%s / %s / %d: %s" artists album track-nr title))))
 
   (defun spotify-current ()
     "Return the current song playing in spotify application."
