@@ -145,14 +145,36 @@ to the mini buffer."
         `(spotify-osa-call ,command))
      (message "Spotify %s" ,command)))
 
+;;;###autoload (autoload 'spotify-play "spotify" "Call Play on spotify player." t)
 (spotify-defun-player-command "Play")
+
+;;;###autoload (autoload 'spotify-pause "spotify" "Call Pause on spotify player." t)
 (spotify-defun-player-command "Pause")
+
+;;;###autoload (autoload 'spotify-playpause "spotify" "Call PlayPause on spotify player." t)
 (spotify-defun-player-command "PlayPause")
+
+;;;###autoload (autoload 'spotify-next "spotify" "Call Next on spotify player." t)
 (spotify-defun-player-command "Next")
+
+;;;###autoload (autoload 'spotify-previous "spotify" "Call Previous on spotify player." t)
 (spotify-defun-player-command "Previous")
 
+;;;###autoload (autoload 'spotify-quit "spotify" "Quit the spotify application." t)
+;;;###autoload (autoload 'spotify-enable-song-notifications "spotify" "Enable notifications for the currently playing song in spotify application." t)
+;;;###autoload (autoload 'spotify-disable-song-notifications "spotify" "Disable notifications for the currently playing song in spotify application." t)
+
 (spotify-eval-except-dbus
- (spotify-defun-player-command "Quit"))
+ (spotify-defun-player-command "Quit")
+
+ (defun spotify-enable-song-notifications ()
+   "Not implemented for this platform."
+   (interactive)
+   (error "Not implemented for this platform"))
+ (defun spotify-disable-song-notifications ()
+   "Not implemented for this platform."
+   (interactive)
+   (error "Not implemented for this platform")))
 
 (provide 'spotify)
 
