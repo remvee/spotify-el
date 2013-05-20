@@ -42,7 +42,17 @@
       ((string= "darwin" system-type))
       (t (error "Platform not supported")))
 
-(when (fboundp 'dbus-init-bus)
+(defmacro spotify-eval-only-dbus (&rest body)
+  "Only `eval' BODY when D-Bus available."
+  (when (fboundp 'dbus-init-bus)
+    (eval `(quote (progn ,@body)))))
+
+(defmacro spotify-eval-except-dbus (&rest body)
+  "Only `eval' BODY when D-Bus not available."
+  (unless (fboundp 'dbus-init-bus)
+    (eval `(quote (progn ,@body)))))
+
+(spotify-eval-only-dbus
   (defun spotify-dbus-call (interface method)
     "On INTERFACE call METHOD via D-Bus on the Spotify service."
     (dbus-call-method-asynchronously :session
@@ -115,15 +125,16 @@ to the mini buffer."
     (interactive)
     (dbus-unregister-object spotify-metadata-change-listener-id)))
 
-(defmacro spotify-osa-call (method)
-  "Tel Spotify to do METHOD via osascript."
-  `(shell-command
-    ,(format "osascript -e \"tell application \\\"Spotify\\\" to %s\""
-             (cond ((string= "next" (downcase method))
-                    "next track")
-                   ((string= "previous" (downcase method))
-                    "previous track")
-                   (t method)))))
+(spotify-eval-except-dbus
+ (defmacro spotify-osa-call (method)
+   "Tel Spotify to do METHOD via osascript."
+   `(shell-command
+     ,(format "osascript -e \"tell application \\\"Spotify\\\" to %s\""
+              (cond ((string= "next" (downcase method))
+                     "next track")
+                    ((string= "previous" (downcase method))
+                     "previous track")
+                    (t method))))))
 
 (defmacro spotify-defun-player-command (command)
   `(defun ,(intern (concat "spotify-" (downcase command))) ()
@@ -140,8 +151,8 @@ to the mini buffer."
 (spotify-defun-player-command "Next")
 (spotify-defun-player-command "Previous")
 
-(unless (fboundp 'spotify-quit)
-  (spotify-defun-player-command "Quit"))
+(spotify-eval-except-dbus
+ (spotify-defun-player-command "Quit"))
 
 (provide 'spotify)
 
