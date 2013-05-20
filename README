@@ -1,8 +1,9 @@
-spotify.el -- Control the spotify application from emacs via D-Bus
+spotify.el -- Control the spotify application from emacs
 
 Play, pause, skip songs in the Spotify app from Emacs.
 
 Copyright (C) 2012, 2013 R.W van 't Veer
+Copyright (C) 2013 Bjarte Johansen
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
