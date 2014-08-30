@@ -38,7 +38,7 @@
 
 ;;; Code:
 
-(cond ((fboundp 'dbus-init-bus) (require 'dbus))
+(cond ((string= "gnu/linux" system-type) (require 'dbus))
       ((string= "darwin" system-type))
       (t (error "Platform not supported")))
 
