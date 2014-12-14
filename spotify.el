@@ -6,7 +6,7 @@
 ;; Author: R.W. van 't Veer
 ;; Created: 18 Oct 2012
 ;; Keywords: convenience
-;; Version: 0.2
+;; Version: 0.3
 ;; URL: https://github.com/remvee/spotify-el
 
 ;; This program is free software; you can redistribute it and/or
@@ -37,6 +37,8 @@
 ;; (spotify-enable-song-notifications)
 
 ;;; Code:
+
+(require 'cl-lib)
 
 (cond ((string= "gnu/linux" system-type) (require 'dbus))
       ((string= "darwin" system-type))
@@ -79,11 +81,11 @@
     "Transform METADATA from spotify to a human readable version."
     (when metadata
       (let ((artists (mapconcat 'identity
-                                (caadr (assoc "xesam:artist" metadata))
+                                (cl-caadr (assoc "xesam:artist" metadata))
                                 ", "))
-            (album (caadr (assoc "xesam:album" metadata)))
-            (track-nr (caadr (assoc "xesam:trackNumber" metadata)))
-            (title (caadr (assoc "xesam:title" metadata))))
+            (album (cl-caadr (assoc "xesam:album" metadata)))
+            (track-nr (cl-caadr (assoc "xesam:trackNumber" metadata)))
+            (title (cl-caadr (assoc "xesam:title" metadata))))
         (format "%s / %s / %d: %s" artists album track-nr title))))
 
   (defun spotify-current ()
@@ -98,8 +100,8 @@
 
 The INTERFACE argument is ignored, PROPERTIES is expected to be
 an alist and the IGNORED argument is also ignored."
-    (let ((status (caadr (assoc "PlaybackStatus" properties)))
-          (current (spotify-humanize-metadata (caadr (assoc "Metadata" properties)))))
+    (let ((status (cl-caadr (assoc "PlaybackStatus" properties)))
+          (current (spotify-humanize-metadata (cl-caadr (assoc "Metadata" properties)))))
       (cond (current (message "Now playing: %s" current))
             (status (message "Spotify %s" status)))))
 
