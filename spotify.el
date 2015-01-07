@@ -6,7 +6,7 @@
 ;; Author: R.W. van 't Veer
 ;; Created: 18 Oct 2012
 ;; Keywords: convenience
-;; Version: 0.3
+;; Version: 0.3.1
 ;; URL: https://github.com/remvee/spotify-el
 
 ;; This program is free software; you can redistribute it and/or
@@ -40,18 +40,26 @@
 
 (require 'cl-lib)
 
-(cond ((string= "gnu/linux" system-type) (require 'dbus))
-      ((string= "darwin" system-type))
-      (t (error "Platform not supported")))
+(defun spotify-p-dbus ()
+  (string= "gnu/linux" system-type))
+
+(defun spotify-p-osa ()
+  (string= "darwin" system-type))
+
+(unless (or (spotify-p-dbus)
+            (spotify-p-osa))
+  (error "Platform not supported"))
+
+(when (spotify-p-dbus) (require 'dbus))
 
 (defmacro spotify-eval-only-dbus (&rest body)
   "Only `eval' BODY when D-Bus available."
-  (when (fboundp 'dbus-init-bus)
+  (when (spotify-p-dbus)
     (eval `(quote (progn ,@body)))))
 
 (defmacro spotify-eval-except-dbus (&rest body)
   "Only `eval' BODY when D-Bus not available."
-  (unless (fboundp 'dbus-init-bus)
+  (unless (spotify-p-dbus)
     (eval `(quote (progn ,@body)))))
 
 (spotify-eval-only-dbus
@@ -142,7 +150,7 @@ to the mini buffer."
   `(defun ,(intern (concat "spotify-" (downcase command))) ()
      ,(format "Call %s on spotify player." command)
      (interactive)
-     ,(if (fboundp 'dbus-init-bus)
+     ,(if (spotify-p-dbus)
           `(spotify-dbus-call "org.mpris.MediaPlayer2.Player" ,command)
         `(spotify-osa-call ,command))
      (message "Spotify %s" ,command)))
