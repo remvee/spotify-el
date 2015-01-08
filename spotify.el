@@ -99,9 +99,12 @@
   (defun spotify-current ()
     "Return the current song playing in spotify application."
     (interactive)
-    (let ((metadata (spotify-dbus-get-property "org.mpris.MediaPlayer2.Player"
-                                               "Metadata")))
-      (spotify-humanize-metadata metadata)))
+    (let* ((metadata (spotify-dbus-get-property "org.mpris.MediaPlayer2.Player"
+                                                "Metadata"))
+           (title (spotify-humanize-metadata metadata)))
+      (if (called-interactively-p 'interactive)
+          (when title (message "%s" title))
+        title)))
 
   (defun spotify-properties-changed (interface properties &rest ignored)
     "Echo spotify playback status and/or metadata to the mini buffer.
