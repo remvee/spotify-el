@@ -41,8 +41,9 @@
 
 (require 'cl-lib)
 
-(defun spotify-p-dbus ()
-  (string= "gnu/linux" system-type))
+(eval-and-compile
+  (defun spotify-p-dbus ()
+    (string= "gnu/linux" system-type)))
 
 (defun spotify-p-osa ()
   (string= "darwin" system-type))
