@@ -8,6 +8,7 @@
 ;; Keywords: convenience
 ;; Version: 0.3.1
 ;; URL: https://github.com/remvee/spotify-el
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
