@@ -6,7 +6,7 @@
 ;; Author: R.W. van 't Veer
 ;; Created: 18 Oct 2012
 ;; Keywords: convenience
-;; Version: 0.3.1
+;; Version: 0.3.3
 ;; URL: https://github.com/remvee/spotify-el
 ;; Package-Requires: ((cl-lib "0.5"))
 
