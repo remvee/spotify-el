@@ -96,7 +96,7 @@
             (album (cl-caadr (assoc "xesam:album" metadata)))
             (track-nr (cl-caadr (assoc "xesam:trackNumber" metadata)))
             (title (cl-caadr (assoc "xesam:title" metadata))))
-        (format "%s / %s / %d: %s" artists album track-nr title))))
+        (format "%s / %s / %s: %s" artists album track-nr title))))
 
   (defun spotify-current ()
     "Return the current song playing in spotify application."
