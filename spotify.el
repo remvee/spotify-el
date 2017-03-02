@@ -43,7 +43,8 @@
 
 (eval-and-compile
   (defun spotify-p-dbus ()
-    (string= "gnu/linux" system-type)))
+    (and (string= "gnu/linux" system-type)
+	 (featurep 'dbusbind)))
 
 (defun spotify-p-osa ()
   (string= "darwin" system-type))
