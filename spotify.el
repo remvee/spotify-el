@@ -176,6 +176,7 @@ to the mini buffer."
 ;;;###autoload (autoload 'spotify-previous "spotify" "Call Previous on spotify player." t)
 (spotify-defun-player-command "Previous")
 
+;;;###autoload (autoload 'spotify-current "spotify" "Return the current song playing in spotify application." t)
 ;;;###autoload (autoload 'spotify-quit "spotify" "Quit the spotify application." t)
 ;;;###autoload (autoload 'spotify-enable-song-notifications "spotify" "Enable notifications for the currently playing song in spotify application." t)
 ;;;###autoload (autoload 'spotify-disable-song-notifications "spotify" "Disable notifications for the currently playing song in spotify application." t)
