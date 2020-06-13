@@ -1,6 +1,6 @@
 ;;; spotify.el --- Control the spotify application from emacs
 
-;; Copyright (C) 2012-2018 R.W van 't Veer
+;; Copyright (C) 2012-2018, 2020 R.W van 't Veer
 ;; Copyright (C) 2013 Bjarte Johansen
 
 ;; Author: R.W. van 't Veer
@@ -46,6 +46,24 @@
 
 (require 'cl-lib)
 
+(defgroup  spotify-el nil
+  "Options for `spotify-el'"
+  :group 'applications)
+
+(defcustom spotify-service-name "spotify"
+  "Name of the DBUS service used by the client we talk to.
+
+The official Spotify client uses `spotify', but one can also use
+alternative clients such as mopidy or spotifyd."
+  :type 'string)
+
+(defcustom spotify-use-system-bus-p nil
+  "Whether to access the spotify client using the system DBUS.
+
+Some clients, such as mopidy or spotifyd, can run as system
+services."
+  :type 'boolean)
+
 (eval-and-compile
   (defun spotify-p-dbus ()
     (and (string= "gnu/linux" system-type)
@@ -70,11 +88,17 @@
   (unless (spotify-p-dbus)
     (eval `(quote (progn ,@body)))))
 
+(defun spotify--dbus-service-name ()
+  (format "org.mpris.MediaPlayer2.%s" spotify-service-name))
+
+(defun spotify--dbus-bus ()
+  (if spotify-use-system-bus-p :system :session))
+
 (spotify-eval-only-dbus
   (defun spotify-dbus-call (interface method)
     "On INTERFACE call METHOD via D-Bus on the Spotify service."
-    (dbus-call-method-asynchronously :session
-                                     "org.mpris.MediaPlayer2.spotify"
+    (dbus-call-method-asynchronously (spotify--dbus-bus)
+                                     (spotify--dbus-service-name)
                                      "/org/mpris/MediaPlayer2"
                                      interface
                                      method
@@ -87,8 +111,8 @@
 
   (defun spotify-dbus-get-property (interface property)
     "On INTERFACE get value of PROPERTY via D-Bus on the Spotify service."
-    (dbus-get-property :session
-                       "org.mpris.MediaPlayer2.spotify"
+    (dbus-get-property (spotify--dbus-bus)
+                       (spotify--dbus-service-name)
                        "/org/mpris/MediaPlayer2"
                        interface
                        property))
@@ -134,8 +158,8 @@ Changes to the currently playing song in spotify will be echoed
 to the mini buffer."
     (interactive)
     (setq spotify-metadata-change-listener-id
-          (dbus-register-signal :session
-                                "org.mpris.MediaPlayer2.Player"
+          (dbus-register-signal (spotify--dbus-bus)
+                                (spotify--dbus-service-name)
                                 "/org/mpris/MediaPlayer2"
                                 "org.freedesktop.DBus.Properties"
                                 "PropertiesChanged"
